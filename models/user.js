@@ -1,6 +1,5 @@
-const mongoose = require("mongoose");
-const validator = require("validator");
-const regex = require("../utils/regex");
+const mongoose = require('mongoose');
+const validator = require('validator');
 
 const userSchema = new mongoose.Schema({
   email: {
@@ -29,4 +28,4 @@ userSchema.statics.emailValidation = function validate({ email }) {
   return validator.isEmail(email);
 };
 
-module.exports = mongoose.model("user", userSchema);
+module.exports = mongoose.model('user', userSchema);

@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-const regex = require("../utils/regex");
+const mongoose = require('mongoose');
+const regex = require('../utils/regex');
 
 const cardSchema = new mongoose.Schema({
   country: {
@@ -51,7 +51,7 @@ const cardSchema = new mongoose.Schema({
   },
   owner: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "user",
+    ref: 'user',
     required: true,
   },
   movieId: {
@@ -68,4 +68,4 @@ const cardSchema = new mongoose.Schema({
   },
 });
 
-module.exports = mongoose.model("card", cardSchema);
+module.exports = mongoose.model('movie', cardSchema);

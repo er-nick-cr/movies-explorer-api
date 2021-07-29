@@ -6,35 +6,32 @@ const isUrl = (link) => {
   return link;
 };
 
-const cardFieldsValidation = celebrate({
+const movieFieldsValidation = celebrate({
   body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().custom(isUrl, 'check URL'),
+    country: Joi.string().required(),
+    director: Joi.string().required(),
+    duration: Joi.number().required(),
+    year: Joi.string().required(),
+    description: Joi.string().required(),
+    image: Joi.string().required().custom(isUrl, 'check URL'),
+    trailer: Joi.string().required().custom(isUrl, 'check URL'),
+    thumbnail: Joi.string().required().custom(isUrl, 'check URL'),
+    movieId: Joi.string().required(),
+    nameRU: Joi.string().required(),
+    nameEN: Joi.string().required(),
   }),
 });
 
 const userFieldsValidation = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    about: Joi.string().required().min(2).max(30),
+    email: Joi.string().email({ tlds: { allow: false } }),
   }),
 });
 
-const idValidation = celebrate({
+const movieIdValidation = celebrate({
   params: Joi.object().keys({
-    id: Joi.string().hex().length(24),
-  }),
-});
-
-const cardIdValidation = celebrate({
-  params: Joi.object().keys({
-    cardId: Joi.string().hex().length(24),
-  }),
-});
-
-const avatarValidation = celebrate({
-  body: Joi.object().keys({
-    avatar: Joi.string().required().custom(isUrl, 'check URL'),
+    movieId: Joi.string().hex().length(24),
   }),
 });
 
@@ -54,17 +51,13 @@ const userDataInputValidation = celebrate({
       .email({ tlds: { allow: false } }),
     password: Joi.string().required().min(8),
     name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string().custom(isUrl, 'check URL'),
   }),
 });
 
 module.exports = {
-  idValidation,
-  cardFieldsValidation,
+  movieFieldsValidation,
   userFieldsValidation,
-  avatarValidation,
-  cardIdValidation,
+  movieIdValidation,
   userCredentialsValidation,
   userDataInputValidation,
 };
