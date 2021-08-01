@@ -2,5 +2,6 @@
 
 Бэкенд приложения movies-explorer
 
-#Публичнй адресс сервера
+# Публичнй адресс сервера
+
 api.movies-explorer-dip.nomoredomains.monster
