@@ -1,6 +1,7 @@
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const { errorUser } = require('../errors/errorMessages');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 const { BadRequestError } = require('../errors/BadRequestError');
@@ -29,7 +30,7 @@ const findCurrentUser = (req, res, next) => {
   User.findById(req.user.id)
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Нет пользователя с таким id');
+        throw new NotFoundError(errorUser.notFound);
       }
       res.send({ user });
     })
@@ -42,20 +43,10 @@ async function createUser(req, res, next) {
   try {
     const { name, email, password } = req.body;
 
-    const isValid = await User.emailValidation({ email });
-
     const candidate = await User.findOne({ email });
 
     if (candidate) {
-      throw new ConflictingRequestError(
-        'Пользователь c таким email уже существует',
-      );
-    }
-
-    if (!isValid) {
-      throw new BadRequestError(
-        'Переданы некорректные данные при создании пользователя.',
-      );
+      throw new ConflictingRequestError(errorUser.conflictRequest);
     }
 
     const hashedPassword = bcrypt.hashSync(password, 12, process.env.NODE_ENV);
@@ -76,9 +67,7 @@ async function createUser(req, res, next) {
       })
       .catch((err) => {
         if (err.name === 'ValidationError') {
-          throw new BadRequestError(
-            'Переданы некорректные данные при создании пользователя.',
-          );
+          throw new BadRequestError(errorUser.badRequest);
         }
         next(err);
       })
@@ -88,8 +77,15 @@ async function createUser(req, res, next) {
   }
 }
 
-const update = (req, res, next) => {
+async function update(req, res, next) {
   const { name, email } = req.body;
+
+  const candidate = await User.findOne({ email });
+
+  if (candidate) {
+    throw new ConflictingRequestError(errorUser.conflictRequest);
+  }
+
   const owner = req.user.id;
   User.findByIdAndUpdate(
     owner,
@@ -101,14 +97,14 @@ const update = (req, res, next) => {
   )
     .then((user) => {
       if (!user) {
-        throw new NotFoundError('Пользователь по указанному _id не найден.');
+        throw new NotFoundError(errorUser.conflictRequest);
       }
       res.send({
         user,
       });
     })
     .catch((err) => next(err));
-};
+}
 
 const login = (req, res, next) => {
   const { email, password } = req.body;
@@ -117,12 +113,12 @@ const login = (req, res, next) => {
     .select('+password')
     .then((user) => {
       if (!user) {
-        throw new UnauthorizedError('Неправильный email или пароль');
+        throw new UnauthorizedError(errorUser.unauthorized);
       }
       if (bcrypt.compareSync(password, user.password)) {
         const token = generateAccessToken(user._id);
         if (!token) {
-          throw new UnauthorizedError('Неправильный email или пароль');
+          throw new UnauthorizedError(errorUser.unauthorized);
         }
         return res
           .cookie('JWT', token, {
@@ -138,7 +134,7 @@ const login = (req, res, next) => {
             email: user.email,
           });
       }
-      throw new UnauthorizedError('Неправильный email или пароль');
+      throw new UnauthorizedError(errorUser.unauthorized);
     })
     .catch((err) => next(err));
 };

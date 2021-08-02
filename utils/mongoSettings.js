@@ -1,7 +1,7 @@
-const { NODE_ENV, DB_NAME } = process.env;
+const { NODE_ENV, DB } = process.env;
 
-const mongoRoute = `mongodb://localhost:27017/${
-  NODE_ENV === 'production' ? DB_NAME : 'moviedb'
+const mongoRoute = `${
+  NODE_ENV === 'production' ? DB : 'mongodb://localhost:27017/moviedb'
 }`;
 const mongoSettings = {
   useNewUrlParser: true,

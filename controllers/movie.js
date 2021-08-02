@@ -1,5 +1,6 @@
 const { BadRequestError } = require('../errors/BadRequestError');
 const { NotFoundError } = require('../errors/NotFoundError');
+const { errorMovie } = require('../errors/errorMessages');
 const Movie = require('../models/movie');
 
 const find = (req, res, next) => {
@@ -41,9 +42,7 @@ const create = (req, res, next) => {
     .then((movie) => res.send(movie))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        throw new BadRequestError(
-          'Переданы некорректные данные при создании фильма.',
-        );
+        throw new BadRequestError(errorMovie.badRequest);
       }
       next(err);
     })
@@ -54,7 +53,7 @@ const deleteMovie = (req, res, next) => {
   Movie.findByIdAndRemove(req.params.movieId)
     .then((movie) => {
       if (!movie) {
-        throw new NotFoundError('Карточка с указанным _id не найдена.');
+        throw new NotFoundError(errorMovie.notFound);
       }
       res.send(movie);
     })

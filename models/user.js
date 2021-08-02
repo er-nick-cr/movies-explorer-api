@@ -14,6 +14,7 @@ const userSchema = new mongoose.Schema({
   },
   name: {
     type: String,
+    require: true,
     minlength: 2,
     maxlength: 30,
   },
@@ -23,9 +24,5 @@ const userSchema = new mongoose.Schema({
     select: false,
   },
 });
-
-userSchema.statics.emailValidation = function validate({ email }) {
-  return validator.isEmail(email);
-};
 
 module.exports = mongoose.model('user', userSchema);

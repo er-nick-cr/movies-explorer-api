@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const { UnauthorizedError } = require('../errors/UnauthorizedError');
+const { errorUser } = require('../errors/errorMessages');
 
 const { NODE_ENV, JWT_SECRET } = process.env;
 
@@ -8,7 +9,7 @@ const auth = (req, res, next) => {
     const token = req.cookies.JWT;
 
     if (!token) {
-      throw new UnauthorizedError('Пожалуйста зарегестрируйтесь');
+      throw new UnauthorizedError(errorUser.unauthorizedToken);
     }
 
     req.user = jwt.verify(
@@ -18,7 +19,7 @@ const auth = (req, res, next) => {
 
     return next();
   } catch (err) {
-    throw new UnauthorizedError('Неверный токен');
+    throw new UnauthorizedError(errorUser.unauthorizedToken);
   }
 };
 

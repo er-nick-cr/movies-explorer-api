@@ -2,8 +2,11 @@ const { celebrate, Joi } = require('celebrate');
 const validator = require('validator');
 
 const isUrl = (link) => {
-  validator.isURL(link, { require_protocol: true });
-  return link;
+  const isLink = validator.isURL(link, { require_protocol: true });
+  if (isLink) {
+    return link;
+  }
+  return isLink;
 };
 
 const movieFieldsValidation = celebrate({
@@ -16,7 +19,7 @@ const movieFieldsValidation = celebrate({
     image: Joi.string().required().custom(isUrl, 'check URL'),
     trailer: Joi.string().required().custom(isUrl, 'check URL'),
     thumbnail: Joi.string().required().custom(isUrl, 'check URL'),
-    movieId: Joi.string().required(),
+    movieId: Joi.number().required(),
     nameRU: Joi.string().required(),
     nameEN: Joi.string().required(),
   }),
@@ -25,7 +28,10 @@ const movieFieldsValidation = celebrate({
 const userFieldsValidation = celebrate({
   body: Joi.object().keys({
     name: Joi.string().required().min(2).max(30),
-    email: Joi.string().email({ tlds: { allow: false } }),
+    email: Joi.string()
+      .required()
+      .min(1)
+      .email({ tlds: { allow: false } }),
   }),
 });
 
@@ -39,6 +45,7 @@ const userCredentialsValidation = celebrate({
   body: Joi.object().keys({
     email: Joi.string()
       .required()
+      .min(1)
       .email({ tlds: { allow: false } }),
     password: Joi.string().required().min(8),
   }),
@@ -48,9 +55,10 @@ const userDataInputValidation = celebrate({
   body: Joi.object().keys({
     email: Joi.string()
       .required()
+      .min(1)
       .email({ tlds: { allow: false } }),
     password: Joi.string().required().min(8),
-    name: Joi.string().min(2).max(30),
+    name: Joi.string().required().min(2).max(30),
   }),
 });
 

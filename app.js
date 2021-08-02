@@ -6,18 +6,10 @@ const bodyParser = require('body-parser');
 const mongoose = require('mongoose');
 const cookieParser = require('cookie-parser');
 const { errors } = require('celebrate');
-const userRoutes = require('./routes/users');
-const movieRoutes = require('./routes/movies');
-const { createUser, login } = require('./controllers/user');
-const { auth } = require('./middlewares/auth');
+const routes = require('./routes/index');
 const { requestLogger, errorLogger } = require('./middlewares/logger');
-const {
-  userCredentialsValidation,
-  userDataInputValidation,
-} = require('./utils/celebrateValidation');
 const { apiLimiter } = require('./middlewares/rateLimiter');
-const { NotFoundError } = require('./errors/NotFoundError');
-
+const errorHandler = require('./errors/errorHandler');
 const { mongoRoute, mongoSettings } = require('./utils/mongoSettings');
 
 const allowedCors = [
@@ -86,32 +78,12 @@ app.use(requestLogger);
 //   }, 0);
 // });
 
-app.post('/signin', userCredentialsValidation, login);
-app.post('/signup', userDataInputValidation, createUser);
-app.post('/signout', auth, (req, res) => {
-  res.clearCookie('JWT');
-  return res.send('Вы разлогинились');
-});
-
-app.use('/users', auth, userRoutes);
-app.use('/movies', auth, movieRoutes);
+app.use(routes);
 
 app.use(errorLogger);
 
 app.use(errors());
 
-app.use('*', () => {
-  throw new NotFoundError('Это не те роуты, которые Вам нужны');
-});
-
-app.use((err, req, res, next) => {
-  const { statusCode = 500, message } = err;
-
-  res.status(statusCode).send({
-    message: statusCode === 500 ? 'На сервере произошла ошибка' : message,
-  });
-
-  next();
-});
+app.use(errorHandler);
 
 app.listen(5000, () => {});
