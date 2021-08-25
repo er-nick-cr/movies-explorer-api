@@ -13,8 +13,8 @@ const errorHandler = require("./errors/errorHandler");
 const { mongoRoute, mongoSettings } = require("./utils/mongoSettings");
 
 const allowedCors = [
-  "https://er-nick-mesto.nomoredomains.monster",
-  "http://er-nick-mesto.nomoredomains.monster",
+  "http://movies-explorer-dip.nomoredomains.monster",
+  "https://movies-explorer-dip.nomoredomains.monster",
   "http://localhost:3000",
 ];
 
