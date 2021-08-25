@@ -1,28 +1,28 @@
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const User = require('../models/user');
-const { errorUser } = require('../errors/errorMessages');
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
+const User = require("../models/user");
+const { errorUser } = require("../errors/errorMessages");
 
 const { NODE_ENV, JWT_SECRET } = process.env;
-const { BadRequestError } = require('../errors/BadRequestError');
+const { BadRequestError } = require("../errors/BadRequestError");
 
-const { UnauthorizedError } = require('../errors/UnauthorizedError');
+const { UnauthorizedError } = require("../errors/UnauthorizedError");
 
-const { NotFoundError } = require('../errors/NotFoundError');
+const { NotFoundError } = require("../errors/NotFoundError");
 
 const {
   ConflictingRequestError,
-} = require('../errors/ConflictingRequestError');
+} = require("../errors/ConflictingRequestError");
 
 const generateAccessToken = (id) => {
   const payload = { id };
 
   return jwt.sign(
     payload,
-    NODE_ENV === 'production' ? JWT_SECRET : 'dev-secret',
+    NODE_ENV === "production" ? JWT_SECRET : "dev-secret",
     {
-      expiresIn: '24h',
-    },
+      expiresIn: "24h",
+    }
   );
 };
 
@@ -66,7 +66,7 @@ async function createUser(req, res, next) {
         });
       })
       .catch((err) => {
-        if (err.name === 'ValidationError') {
+        if (err.name === "ValidationError") {
           throw new BadRequestError(errorUser.badRequest);
         }
         next(err);
@@ -82,7 +82,7 @@ async function update(req, res, next) {
 
   const candidate = await User.findOne({ email });
 
-  if (candidate) {
+  if (candidate && candidate.email !== email) {
     throw new ConflictingRequestError(errorUser.conflictRequest);
   }
 
@@ -93,7 +93,7 @@ async function update(req, res, next) {
     {
       new: true,
       runValidators: true,
-    },
+    }
   )
     .then((user) => {
       if (!user) {
@@ -110,7 +110,7 @@ const login = (req, res, next) => {
   const { email, password } = req.body;
 
   User.findOne({ email })
-    .select('+password')
+    .select("+password")
     .then((user) => {
       if (!user) {
         throw new UnauthorizedError(errorUser.unauthorized);
@@ -121,7 +121,7 @@ const login = (req, res, next) => {
           throw new UnauthorizedError(errorUser.unauthorized);
         }
         return res
-          .cookie('JWT', token, {
+          .cookie("JWT", token, {
             maxAge: 3600000,
             httpOnly: true,
             sameSite: true,
